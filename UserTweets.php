@@ -18,16 +18,34 @@ class UserTweets
         $timeOnlineList = [];
         $tweets = $this->findTweets($username, $totalTweets);
 
-        if (array_key_exists('errors', $tweets)) {
-            echo $this->buildErrorResult($test->errors[0]->message);
+        if (!$this->validateRequest($tweets)) {
+            echo $this->buildErrorResult('Error: Please check the username or your token credentials');
             die;
         }
 
         foreach ($tweets as $tweet) {
-            $timeOnlineList[] = $this->extractHourAndMinutes($tweet->created_at);
+            $timeOnlineList[] = $this->extractHour($tweet->created_at);
         }
 
-        echo json_encode($timeOnlineList);
+        echo json_encode(['data' => $timeOnlineList, 'success' => 'true']);
+    }
+
+    /**
+     * @param object | array $tweets
+     *
+     * @return bool
+     */
+    private function validateRequest($tweets)
+    {
+        if (array_key_exists('errors', $tweets)) {
+            return false;
+        }
+
+        if (array_key_exists('error', (array) $tweets)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -53,7 +71,7 @@ class UserTweets
      */
     private function buildErrorResult($message)
     {
-        return json_encode(['errors' => $message]);
+        return json_encode(['errors' => $message, 'success' => 'false']);
     }
 
     /**
@@ -72,11 +90,11 @@ class UserTweets
      *
      * @return string
      */
-    private function extractHourAndMinutes($dateTime)
+    private function extractHour($dateTime)
     {
         $date = new DateTime($dateTime);
 
-        return $date->format('H:i');
+        return $date->format('hA');
     }
 
 }
