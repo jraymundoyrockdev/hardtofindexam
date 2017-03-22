@@ -1,0 +1,11 @@
+{
+  "require": {
+     "j7mbo/twitter-api-php": "dev-master",
+     "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "HardToFindExam\\": "src/"
+    }
+  }
+}
